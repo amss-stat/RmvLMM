@@ -280,7 +280,7 @@ cat("Number of SNPs:", n_snp, "\n")
 # 2) Read other parts and merge by columns
 # -------------------------
 for (part in 2:n_parts) {
-  file_i <- file.path(out_dir, sprintf("sim_results_part%02d_50000_10.rds", part)) #_300000_20
+  file_i <- file.path(out_dir, sprintf("sim_results_part%02d_50000_10.rds", part))
   if (!file.exists(file_i)) stop("Missing files: ", file_i)
   
   part_res <- readRDS(file_i)
