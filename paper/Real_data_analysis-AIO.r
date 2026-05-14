@@ -1,7 +1,8 @@
 # ============================================================================================================================================================
 # Real_data_analysis-AIO.r
 # ============================================================================================================================================================
-# The program includes a complete GWAS analysis workflow, including data preprocessing, quality control, model fitting, hypothesis testing, GWAS scanning, results analysis, and visualization.
+# The program includes a complete biobank-scale multi-trait GWAS workflow with RmvLMM, 
+# including data preprocessing, quality control, model fitting, hypothesis testing, GWAS scanning, results analysis, and visualization.
 # ============================================================================================================================================================
 
 
