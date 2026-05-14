@@ -83,74 +83,6 @@ prepare_hypothesis_test_data <- function(precomputed_data, Vb_est, Ve_est) {
 }
 
 
-calculate_p_values_for_matrix <- function(test_data, G_rot,
-                                          comb_method = "Cauchy",
-                                          mode = "single",
-                                          block_size = 10000) {
-  W_sq_matrix <- test_data$W_sq_matrix
-  Q_stacked <- test_data$Q_stacked
-  Ew_matrix <- test_data$Ew_matrix
-  RSS_H0_vec <- test_data$RSS_H0_vec
-
-  n <- test_data$n
-  d <- test_data$d
-  c <- test_data$c
-  m <- ncol(G_rot)
-
-  df1 <- 1
-  df2 <- n - c - 1
-  P_matrix <- matrix(NA, nrow = m, ncol = d)
-
-  # Block-wise processing
-  start_indices <- seq(1, m, by = block_size)
-
-  for (start_idx in start_indices) {
-    end_idx <- min(start_idx + block_size - 1, m)
-    idx_seq <- start_idx:end_idx
-
-    # Extract block (drop=FALSE prevents dimension loss)
-    G_block <- G_rot[, idx_seq, drop = FALSE]
-
-    # Matrix operations for the block
-    V_stacked_block <- crossprod(Q_stacked, G_block)
-    Numer_Mat_block <- crossprod(G_block, Ew_matrix)^2
-
-    # Calculate G^2 and Denominator term (Immediate release)
-    G_block_sq <- G_block^2
-    SS_G_W_block <- crossprod(G_block_sq, W_sq_matrix)
-    rm(G_block_sq)
-
-    # Loop over traits
-    for (j in 1:d) {
-      row_idx_Q <- ((j - 1) * c + 1):(j * c)
-      V_j <- V_stacked_block[row_idx_Q, , drop = FALSE]
-
-      ss_H_G_w <- colSums(V_j^2)
-      ss_G_w <- SS_G_W_block[, j]
-      delta_RSS_num <- Numer_Mat_block[, j]
-      rss_h0 <- RSS_H0_vec[j]
-
-      ss_g_ortho <- ss_G_w - ss_H_G_w
-      is_stable <- ss_g_ortho > (1e-10 * ss_G_w)
-
-      p_vals_vec <- rep(1.0, length(idx_seq))
-
-      if (any(is_stable)) {
-        curr_delta <- delta_RSS_num[is_stable]
-        curr_ortho <- ss_g_ortho[is_stable]
-        curr_RSS_H1 <- pmax(rss_h0 - (curr_delta / curr_ortho), 1e-12)
-
-        F_stat <- (curr_delta / curr_ortho * df2) / curr_RSS_H1
-        p_vals_vec[is_stable] <- pf(F_stat, df1, df2, lower.tail = FALSE)
-      }
-      P_matrix[idx_seq, j] <- p_vals_vec
-    }
-  }
-
-  combine_p_values(p_values = P_matrix, mode = mode, comb_method = comb_method)
-}
-
-
 combine_p_values <- function(p_values, mode = "single", comb_method = "Top2") {
   if (is.vector(p_values)) p_values <- matrix(p_values, nrow = 1)
   p_values[is.na(p_values)] <- 1.0
@@ -233,6 +165,227 @@ combine_p_values <- function(p_values, mode = "single", comb_method = "Top2") {
     return(list(Cauchy = res_cauchy, Fisher = res_fisher, Top2 = res_top2))
   }
 }
+
+
+calculate_p_values_for_matrix <- function(test_data, G_rot,
+                                          comb_method = "Cauchy",
+                                          mode = "single",
+                                          block_size = 10000) {
+  W_sq_matrix <- test_data$W_sq_matrix
+  Q_stacked <- test_data$Q_stacked
+  Ew_matrix <- test_data$Ew_matrix
+  RSS_H0_vec <- test_data$RSS_H0_vec
+
+  n <- test_data$n
+  d <- test_data$d
+  c <- test_data$c
+  m <- ncol(G_rot)
+
+  df1 <- 1
+  df2 <- n - c - 1
+  P_matrix <- matrix(NA, nrow = m, ncol = d)
+
+  # Block-wise processing
+  start_indices <- seq(1, m, by = block_size)
+
+  for (start_idx in start_indices) {
+    end_idx <- min(start_idx + block_size - 1, m)
+    idx_seq <- start_idx:end_idx
+
+    # Extract block (drop=FALSE prevents dimension loss)
+    G_block <- G_rot[, idx_seq, drop = FALSE]
+
+    # Matrix operations for the block
+    V_stacked_block <- crossprod(Q_stacked, G_block)
+    Numer_Mat_block <- crossprod(G_block, Ew_matrix)^2
+
+    # Calculate G^2 and Denominator term (Immediate release)
+    G_block_sq <- G_block^2
+    SS_G_W_block <- crossprod(G_block_sq, W_sq_matrix)
+    rm(G_block_sq)
+
+    # Loop over traits
+    for (j in 1:d) {
+      row_idx_Q <- ((j - 1) * c + 1):(j * c)
+      V_j <- V_stacked_block[row_idx_Q, , drop = FALSE]
+
+      ss_H_G_w <- colSums(V_j^2)
+      ss_G_w <- SS_G_W_block[, j]
+      delta_RSS_num <- Numer_Mat_block[, j]
+      rss_h0 <- RSS_H0_vec[j]
+
+      ss_g_ortho <- ss_G_w - ss_H_G_w
+      is_stable <- ss_g_ortho > (1e-10 * ss_G_w)
+
+      p_vals_vec <- rep(1.0, length(idx_seq))
+
+      if (any(is_stable)) {
+        curr_delta <- delta_RSS_num[is_stable]
+        curr_ortho <- ss_g_ortho[is_stable]
+        curr_RSS_H1 <- pmax(rss_h0 - (curr_delta / curr_ortho), 1e-12)
+
+        F_stat <- (curr_delta / curr_ortho * df2) / curr_RSS_H1
+        p_vals_vec[is_stable] <- pf(F_stat, df1, df2, lower.tail = FALSE)
+      }
+      P_matrix[idx_seq, j] <- p_vals_vec
+    }
+  }
+
+  combine_p_values(p_values = P_matrix, mode = mode, comb_method = comb_method)
+}
+
+
+combine_p_values_with_raw_p_mat <- function(p_values, mode = "single", comb_method = "Top2") {
+  if (is.vector(p_values)) p_values <- matrix(p_values, nrow = 1)
+  p_values[is.na(p_values)] <- 1.0
+  n_snp <- nrow(p_values)
+  d <- ncol(p_values)
+  p_values <- pmin(pmax(p_values, .Machine$double.xmin), 1.0)
+
+  # Cauchy
+  if (mode == "ALL" || (mode == "single" && comb_method == "Cauchy")) {
+    stat <- rowMeans(tan((0.5 - p_values) * pi))
+    res_cauchy <- 0.5 - atan(stat) / pi
+    if (mode == "single") {
+      return(res_cauchy)
+    }
+  }
+
+  # Fisher
+  if (mode == "ALL" || (mode == "single" && comb_method == "Fisher")) {
+    X2 <- -2 * rowSums(log(p_values))
+    res_fisher <- pchisq(X2, df = 2 * d, lower.tail = FALSE)
+    if (mode == "single") {
+      return(res_fisher)
+    }
+  }
+
+  # Top2 (ACAT)
+  if (mode == "ALL" || (mode == "single" && comb_method == "Top2")) {
+    if (d < 2) {
+      if (mode == "single") stop("Top2 requires at least 2 traits.")
+      res_top2 <- rep(NA, n_snp)
+    } else {
+      # Identify 1st and 2nd smallest P-values
+      p_min1 <- do.call(pmin, as.data.frame(p_values))
+      min_idx <- max.col(-p_values, ties.method = "first")
+
+      linear_idx <- (1:n_snp) + (min_idx - 1) * as.numeric(n_snp)
+
+      P_temp <- p_values
+      P_temp[linear_idx] <- Inf
+      p_min2 <- do.call(pmin, as.data.frame(P_temp))
+      rm(P_temp)
+
+      # ACAT Calculation
+      lp1 <- log(p_min1)
+      lp2 <- log(p_min2)
+      lc <- lp1 + lp2
+      la <- lc / 2
+      a_val <- pmin(exp(la), 1 - 1e-16)
+
+      log_p1 <- pbeta(a_val, shape1 = 2, shape2 = d - 1, log.p = TRUE)
+
+      if (d == 2) {
+        log_p2 <- rep(-Inf, n_snp)
+      } else {
+        log_1_minus_a <- log1p(-a_val)
+        series_sum <- numeric(n_snp)
+        for (k in 1:(d - 2)) {
+          series_sum <- series_sum + exp(k * log_1_minus_a) / k
+        }
+        bracket_val <- -la - series_sum
+        is_valid <- bracket_val > 1e-300
+
+        log_p2 <- rep(-Inf, n_snp)
+        const_term <- log(d) + log(d - 1)
+        if (any(is_valid)) {
+          log_p2[is_valid] <- const_term + lc[is_valid] + log(bracket_val[is_valid])
+        }
+      }
+
+      max_l <- pmax(log_p1, log_p2)
+      res_top2 <- exp(max_l + log(exp(log_p1 - max_l) + exp(log_p2 - max_l)))
+      res_top2 <- pmin(res_top2, 1.0)
+    }
+    if (mode == "single") {
+      return(res_top2)
+    }
+  }
+
+  if (mode == "ALL") {
+    return(list(Cauchy = res_cauchy, Fisher = res_fisher, Top2 = res_top2, p_values = p_values))
+  }
+}
+
+
+calculate_p_values_for_matrix_detailed <- function(test_data, G_rot,
+                                          comb_method = "Cauchy",
+                                          mode = "single",
+                                          block_size = 10000) {
+  W_sq_matrix <- test_data$W_sq_matrix
+  Q_stacked <- test_data$Q_stacked
+  Ew_matrix <- test_data$Ew_matrix
+  RSS_H0_vec <- test_data$RSS_H0_vec
+
+  n <- test_data$n
+  d <- test_data$d
+  c <- test_data$c
+  m <- ncol(G_rot)
+
+  df1 <- 1
+  df2 <- n - c - 1
+  P_matrix <- matrix(NA, nrow = m, ncol = d)
+
+  # Block-wise processing
+  start_indices <- seq(1, m, by = block_size)
+
+  for (start_idx in start_indices) {
+    end_idx <- min(start_idx + block_size - 1, m)
+    idx_seq <- start_idx:end_idx
+
+    # Extract block (drop=FALSE prevents dimension loss)
+    G_block <- G_rot[, idx_seq, drop = FALSE]
+
+    # Matrix operations for the block
+    V_stacked_block <- crossprod(Q_stacked, G_block)
+    Numer_Mat_block <- crossprod(G_block, Ew_matrix)^2
+
+    # Calculate G^2 and Denominator term (Immediate release)
+    G_block_sq <- G_block^2
+    SS_G_W_block <- crossprod(G_block_sq, W_sq_matrix)
+    rm(G_block_sq)
+
+    # Loop over traits
+    for (j in 1:d) {
+      row_idx_Q <- ((j - 1) * c + 1):(j * c)
+      V_j <- V_stacked_block[row_idx_Q, , drop = FALSE]
+
+      ss_H_G_w <- colSums(V_j^2)
+      ss_G_w <- SS_G_W_block[, j]
+      delta_RSS_num <- Numer_Mat_block[, j]
+      rss_h0 <- RSS_H0_vec[j]
+
+      ss_g_ortho <- ss_G_w - ss_H_G_w
+      is_stable <- ss_g_ortho > (1e-10 * ss_G_w)
+
+      p_vals_vec <- rep(1.0, length(idx_seq))
+
+      if (any(is_stable)) {
+        curr_delta <- delta_RSS_num[is_stable]
+        curr_ortho <- ss_g_ortho[is_stable]
+        curr_RSS_H1 <- pmax(rss_h0 - (curr_delta / curr_ortho), 1e-12)
+
+        F_stat <- (curr_delta / curr_ortho * df2) / curr_RSS_H1
+        p_vals_vec[is_stable] <- pf(F_stat, df1, df2, lower.tail = FALSE)
+      }
+      P_matrix[idx_seq, j] <- p_vals_vec
+    }
+  }
+
+  combine_p_values_with_raw_p_mat(p_values = P_matrix, mode = mode, comb_method = comb_method)
+}
+
 
 library(survival)
 library(flexsurv)
