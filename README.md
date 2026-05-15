@@ -67,8 +67,6 @@ Before running the analysis, ensure your data follows these formats:
 
 *Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
----
-
 ### 2. Basic Multi-trait GWAS
 For smaller datasets (e.g., $N < 20,000$), you can process the entire sample at once:
 
