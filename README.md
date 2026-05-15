@@ -3,13 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
 
-**RmvLMM** is a scalable and powerful statistical framework designed for multi-trait Genome-Wide Association Studies (GWAS) on biobank-scale datasets. 
-
-As detailed in our paper, *"A rotated multivariate linear mixed model for dual large-scale genome-wide association study"*, RmvLMM addresses the computational challenges of analyzing multiple phenotypes across hundreds of thousands of individuals, and achieves high detection power in multi-trait GWAS.
+Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are not computationally scalable to such massive datasets, as they are severely constrained by prohibitive demands on computational memory and excessive processing time. RmvLMM addresses the computational challenges and achieves high detection power in multi-trait GWAS.
 
 ## Key Features
 
-- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multivariate analysis.
+- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-traIT analysis.
 - **Fast MoM-REML Iterative algorithm:** A novel algorithm for rapid covariance matrix estimation.
 - **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
 - **Biobank Scalability:** Efficiently handles tens of thousands of individuals and millions of SNPs.
@@ -34,7 +32,7 @@ Tested with:
 ## Quick Start
 
 ### 1. Basic Multi-Trait GWAS
-For smaller datasets (e.g., $N < 20,000$), use `run_RmvLMM` directly:
+For small datasets (e.g., $N < 20,000$), use `run_RmvLMM` directly:
 
 ```r
 library(RmvLMM)
@@ -47,7 +45,7 @@ results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "group1_results.rds
 ```
 
 ### 2. Biobank-Scale Aggregation
-For massive cohorts, analyze split groups separately and then combine:
+For Biobank-scale cohorts, analyze split groups separately and then combine:
 
 ```r
 # Combine results from different groups and calibrate using independent SNPs
@@ -58,12 +56,7 @@ final_results <- bank_RmvLMM(
 )
 ```
 
-## Repository Structure
-
-- `R/`: Contains the core implementation of the RmvLMM algorithm.
-- [`paper/`](./paper/): Contains all original R scripts and simulation codes used in the paper (Power, FPR, and Real Data Analysis workflow).
-
 ## Citation
 
 If you use RmvLMM in your research, please cite:
-> *A rotated multivariate linear mixed model for dual large-scale genome-wide association study* (Submitted to Nature Genetics).
+> Guo, H. *et al*. *A rotated multivariate linear mixed model for dual large-scale genome-wide association study* (Submitted to Nature Genetics, 2026).
