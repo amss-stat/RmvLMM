@@ -3,11 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
 
-Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are not computationally scalable to such massive datasets, as they are severely constrained by prohibitive demands on computational memory and excessive processing time. RmvLMM addresses the computational challenges and achieves high detection power in multi-trait GWAS.
+Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these computational challenges using an orthogonal method, achieving both computational efficiency and high detection power.
 
 ## Key Features
 
-- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-traIT analysis.
+- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-trait analysis.
 - **Fast MoM-REML Iterative algorithm:** A novel algorithm for rapid covariance matrix estimation.
 - **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
 - **Biobank Scalability:** Efficiently handles tens of thousands of individuals and millions of SNPs.
@@ -29,29 +29,107 @@ Tested with:
 - survival (3.8.3)
 - flexsurv (2.3.2)
 
+这个README整体结构清晰，逻辑严密。针对你提出的修改要求，我对内容进行了润色和补充，修复了小的笔误（如 "traIT"），并增加了数据格式的可视化展示。
+
+以下是修改后的版本：
+
+---
+
+# RmvLMM: A Rotated Multivariate Linear Mixed Model for Dual Large-Scale GWAS
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
+[![Package version](https://img.shields.io/badge/version-0.0.0.9000-orange.svg)](https://github.com/amss-stat/RmvLMM)
+
+Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, designed for biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these challenges using an orthogonal rotation framework, achieving both computational efficiency and high detection power.
+
+## Key Features
+
+- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-trait analysis.
+- **Fast MoM-REML Iterative Algorithm:** A novel algorithm for rapid covariance matrix estimation.
+- **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
+- **Biobank Scalability:** Efficiently handles hundreds of thousands of individuals and millions of SNPs.
+
+## Installation
+
+You can install the development version of RmvLMM from GitHub:
+
+```r
+# install.packages("remotes")
+remotes::install_github("amss-stat/RmvLMM")
+```
+
+### Dependencies
+Tested with:
+- R (>= 4.4.0)
+- data.table (1.17.2)
+- MASS (7.3.65)
+- survival (3.8.3)
+- flexsurv (2.3.2)
+
 ## Quick Start
 
-### 1. Basic Multi-Trait GWAS
-For small datasets (e.g., $N < 20,000$), use `run_RmvLMM` directly:
+### 1. Input Data Format
+Before running the analysis, ensure your data follows these formats:
+
+**Phenotype Matrix (`Y`)**: $N \times D$ matrix of **quantitative** traits.
+| ID | Trait_1 | Trait_2 | ... | Trait_D |
+|:---:|:---:|:---:|:---:|:---:|
+| Indiv_1 | 1.25 | -0.42 | ... | 0.88 |
+| Indiv_2 | -0.12 | 2.15 | ... | -1.04 |
+| Indiv_3 | 0.55 | 0.33 | ... | 0.12 |
+
+**Covariate Matrix (`X`)**: $N \times C$ matrix, **must include a column of 1s** as the intercept.
+| ID | Intercept | Age | Sex | PC1 |
+|:---:|:---:|:---:|:---:|:---:|
+| Indiv_1 | 1 | 45 | 1 | -0.012 |
+| Indiv_2 | 1 | 52 | 0 | 0.045 |
+| Indiv_3 | 1 | 38 | 1 | -0.008 |
+
+**Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). The first column must be SNP IDs.
+| SNP_ID | Indiv_1 | Indiv_2 | Indiv_3 | ... |
+|:---:|:---:|:---:|:---:|:---:|
+| rs1001 | 0 | 1 | 0 | ... |
+| rs1002 | 2 | 1 | 0 | ... |
+| rs1003 | 0 | 0 | 1 | ... |
+
+**Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
+
+**Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of ~20,000+ approximately independent SNPs (selected via LD pruning or physical distance).
+| SNP_ID |
+|:---:|
+| rs125 |
+| rs458 |
+| rs992 |
+
+---
+
+### 2. Basic Multi-Trait GWAS (Small Scale)
+For smaller datasets (e.g., $N < 20,000$), you can process the entire sample at once:
 
 ```r
 library(RmvLMM)
 
-# Y: Phenotype matrix (N x D)
-# X: Covariate matrix (N x C)
+# Y: Quantitative phenotype matrix (N x D)
+# X: Covariate matrix (N x C, includes a column of 1s)
 # K: Sample relatedness matrix (N x N)
-# G: Genotype matrix with SNP ID (M x N)
-results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "group1_results.rds")
+# G: Genotype matrix with SNP ID in the first column (M x (N+1))
+results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "results.rds")
 ```
 
-### 2. Biobank-Scale Aggregation
-For Biobank-scale cohorts, analyze split groups separately and then combine:
+### 3. Biobank-Scale Aggregation (Large Scale)
+For large cohorts (e.g., UK Biobank), we recommend a "Divided-and-Combined" strategy:
+
+1.  **Split Samples:** Divide the total sample into multiple groups, each containing about 10,000 individuals.
+2.  **Parallel Processing:** For each group, run `run_RmvLMM()` independently and save the results as `.rds` files.
+3.  **Identify Calibration SNPs:** Prepare a ID list of at least 20,000 approximately independent SNPs.
+4.  **Combine & Calibrate:** Use `bank_RmvLMM` to aggregate the results into a final omnibus test.
 
 ```r
-# Combine results from different groups and calibrate using approximately independent SNPs
+# Combine results from multiple group files
 final_results <- bank_RmvLMM(
-  rds_files = c("part1.rds", "part2.rds", "part3.rds"),    # obtained from run_RmvLMM() for all groups
-  indep_snp_file = "independent_snps.csv",    # an ID list of tens of thousands approximately independent SNPs
+  rds_files = c("part1.rds", "part2.rds", "part3.rds", ...),    # obtained from run_RmvLMM() for all groups
+  indep_snp_file = "independent_snps.csv",    # ID List of ~20,000+ independent SNPs
   out_file = "final_calibrated_results.rds"
 )
 ```
