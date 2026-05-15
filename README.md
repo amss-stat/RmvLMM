@@ -73,10 +73,11 @@ For smaller datasets (e.g., $N < 20,000$), you can process the entire sample at 
 ```r
 library(RmvLMM)
 
-# Y: Quantitative phenotype matrix (N x D)
-# X: Covariate matrix (N x C, includes a column of 1s)
-# K: Sample relatedness matrix (N x N)
-# G: Genotype matrix with SNP ID in the first column (M x (N+1))
+# Y: Quantitative phenotype matrix (N x D numeric matrix)
+# X: Covariate matrix (N x C numeric matrix, includes a column of 1s)
+# K: Sample relatedness matrix (N x N numeric matrix)
+# G: Genotype matrix (M x N numeric matrix). SNP IDs must be provided as row names.
+#    A numeric vector is also acceptable for a single SNP.
 results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "results.rds")
 ```
 
