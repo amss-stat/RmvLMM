@@ -36,4 +36,4 @@ To run the scripts in this folder, you will need `R-4.4.0` installed along with 
 * **Statistics & Distribution Fitting:** `flexsurv 2.3.2`, `fitdistrplus 1.2.2`, `moments 0.14.1`, `survival 3.8.3`
 * **Visualization:** `ggplot2 3.5.2`, `patchwork 1.3.0`, `scales 1.4.0`
 * **Bioinformatics & Web Mining:** `rentrez 1.2.3`, `xml2 1.3.8`, `dplyr 1.1.4`, `tidyr 1.3.1`, `stringr 1.5.1`
-* **External Tools:** `PLINK v1.90b6.24 64-bit (6 Jun 2021)` and `MAGMA v1.10 (linux)` are required for certain QC and annotation steps in the real data workflow.
+* **External Tools:** `PLINK v1.90b6.24 64-bit (6 Jun 2021)` and `MAGMA v1.10 (linux)` are required for certain QC, I/O operations for large files, and annotation steps in the real data workflow.
