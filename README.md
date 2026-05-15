@@ -19,8 +19,8 @@ As detailed in our paper, *"A rotated multivariate linear mixed model for dual l
 You can install the development version of RmvLMM from GitHub:
 
 ```r
-# install.packages("devtools")
-devtools::install_github("amss-stat/RmvLMM")
+# install.packages("remotes")
+remotes::install_github("amss-stat/RmvLMM")
 ```
 
 ### Dependencies
