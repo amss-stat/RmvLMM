@@ -5,7 +5,7 @@
 
 **RmvLMM** is a scalable and powerful statistical framework designed for multi-trait Genome-Wide Association Studies (GWAS) on biobank-scale datasets. 
 
-As detailed in our paper, *"A rotated multivariate linear mixed model for dual large-scale genome-wide association study"*, RmvLMM addresses the computational challenges of analyzing multiple phenotypes across hundreds of thousands of individuals.
+As detailed in our paper, *"A rotated multivariate linear mixed model for dual large-scale genome-wide association study"*, RmvLMM addresses the computational challenges of analyzing multiple phenotypes across hundreds of thousands of individuals, and achieves high detection power in multi-trait GWAS.
 
 ## Key Features
 
