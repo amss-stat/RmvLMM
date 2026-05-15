@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{run_RmvLMM}
 \alias{run_RmvLMM}
-\title{Rotated Multivariate Linear Mixed Model (RmvLMM) for multi-trait GWAS}
+\title{Rotated Multivariate Linear Mixed Model for multi trait GWAS}
 \usage{
 run_RmvLMM(
   Y,

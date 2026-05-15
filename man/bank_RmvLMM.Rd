@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.R
 \name{bank_RmvLMM}
 \alias{bank_RmvLMM}
-\title{Aggregate Group-wise RmvLMM Results using Divide-and-combine strategy}
+\title{Aggregate Group wise RmvLMM Results using Divide and combine strategy}
 \usage{
 bank_RmvLMM(rds_files, indep_snp_file, out_file = NULL)
 }
