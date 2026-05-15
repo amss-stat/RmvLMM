@@ -126,5 +126,6 @@ results <- run_RmvLMM(Y = Y, X = X, G = G, K_precomp = K_precomp, out_file = "ba
 
 If you use RmvLMM in your research, please cite:
 > Guo, H.<sup>†</sup>, Zhang, Q.<sup>†</sup>, Zheng, X., Quan, Y., & Li, Q.<sup>*</sup> (2026). *A rotated multivariate linear mixed model for dual large-scale genome-wide association study* (Submitted).
+> 
 > <sup>†</sup> The first two authors should be regarded as Joint First Authors.  
 > <sup>*</sup> Corresponding author. E-mail: [liqz@amss.ac.cn](mailto:liqz@amss.ac.cn)
