@@ -56,6 +56,8 @@ Before running the analysis, ensure your data follows these formats:
 | rs1002 | 2 | 1 | 0 | ... |
 | rs1003 | 0 | 0 | 1 | ... |
 
+*Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
+
 **Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
 
 **Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance). The file must contain a header named SNP with the corresponding IDs.
@@ -64,8 +66,6 @@ Before running the analysis, ensure your data follows these formats:
 | rs125 |
 | rs458 |
 | rs992 |
-
-*Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
 ### 2. Basic Multi-trait GWAS
 For smaller datasets (e.g., $N < 20,000$), you can process the entire sample at once:
