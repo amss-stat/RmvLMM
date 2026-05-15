@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
-[![Package version](https://img.shields.io/badge/version-0.0.0.9000-orange.svg)](https://github.com/amss-stat/RmvLMM)
+[![Package version](https://img.shields.io/badge/version-0.0.0.9-orange.svg)](https://github.com/amss-stat/RmvLMM)
 
 Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these challenges using an orthogonal rotation framework, achieving both computational efficiency and high detection power.
 
@@ -103,7 +103,7 @@ final_results <- bank_RmvLMM(
 RmvLMM is highly optimized for large-scale tasks. 
 - **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires only **~3GB of RAM**.
 - **Real-world Benchmark:** In our study, an analysis of **323,839 individuals, 454,296 SNPs, and 26 traits** was completed in just **13 hours** using a server with 60 cores and 180GB of RAM.
-- **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait LMM-GWAS at this scale within a reasonable timeframe.
+- **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait GWAS based on linear mixed model at this scale within a reasonable timeframe.
 
 ### 2. Optimization: Pre-computing Eigen-decomposition
 The eigen-decomposition of the relatedness matrix $K$ is computationally expensive. If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
