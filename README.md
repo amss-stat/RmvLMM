@@ -48,10 +48,10 @@ results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "group1_results.rds
 For Biobank-scale cohorts, analyze split groups separately and then combine:
 
 ```r
-# Combine results from different groups and calibrate using independent SNPs
+# Combine results from different groups and calibrate using approximately independent SNPs
 final_results <- bank_RmvLMM(
   rds_files = c("part1.rds", "part2.rds", "part3.rds"),    # obtained from run_RmvLMM() for all groups
-  indep_snp_file = "independent_snps.csv",
+  indep_snp_file = "independent_snps.csv",    # an ID list of tens of thousands approximately independent SNPs
   out_file = "final_calibrated_results.rds"
 )
 ```
