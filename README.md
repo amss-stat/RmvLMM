@@ -102,7 +102,7 @@ final_results <- bank_RmvLMM(
 
 ### 1. Memory and Efficiency
 RmvLMM is highly optimized for large-scale tasks. 
-- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires only **~3GB of RAM**.
+- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires only **~16GB of RAM**.
 - **Real-world Benchmark:** In our study, an analysis of **323,839 individuals, 454,296 SNPs, and 26 traits** was completed in just **13 hours** using a server with 60 cores and 180GB of RAM.
 - **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait GWAS based on linear mixed model at this scale within a reasonable timeframe.
 
