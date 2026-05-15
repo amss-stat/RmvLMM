@@ -24,11 +24,11 @@ remotes::install_github("amss-stat/RmvLMM")
 
 ### Dependencies
 Tested with:
-- R (>= 4.4.0)
-- data.table (1.17.2)
-- MASS (7.3.65)
-- survival (3.8.3)
-- flexsurv (2.3.2)
+`R (>= 4.4.0)`
+`data.table (1.17.2)`
+`MASS (7.3.65)`
+`survival (3.8.3)`
+`flexsurv (2.3.2)`
 
 ## Quick Start
 
