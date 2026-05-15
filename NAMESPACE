@@ -2,3 +2,4 @@
 
 export(bank_RmvLMM)
 export(run_RmvLMM)
+import(data.table)
