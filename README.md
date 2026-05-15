@@ -35,19 +35,19 @@ Tested with:
 ### 1. Input Data Format
 Before running the analysis, ensure your data follows these formats:
 
-**Phenotype Matrix (`Y`)**: $N \times D$ matrix of **quantitative** traits.
+**Phenotype Matrix (`Y`)**: $N \times D$ matrix of quantitative traits.
 | ID | Trait_1 | Trait_2 | ... | Trait_D |
 |:---:|:---:|:---:|:---:|:---:|
 | Indiv_1 | 1.25 | -0.42 | ... | 0.88 |
 | Indiv_2 | -0.12 | 2.15 | ... | -1.04 |
 | Indiv_3 | 0.55 | 0.33 | ... | 0.12 |
 
-**Covariate Matrix (`X`)**: $N \times C$ matrix, **must include a column of 1s** as the intercept.
-| ID | Intercept | Age | Sex | PC1 |
-|:---:|:---:|:---:|:---:|:---:|
-| Indiv_1 | 1 | 45 | 1 | -0.012 |
-| Indiv_2 | 1 | 52 | 0 | 0.045 |
-| Indiv_3 | 1 | 38 | 1 | -0.008 |
+**Covariate Matrix (`X`)**: $N \times C$ matrix, must include a column of 1s as the intercept.
+| ID | Intercept | Age | Sex | PC1 | ... |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| Indiv_1 | 1 | 45 | 1 | -0.012 | ... |
+| Indiv_2 | 1 | 52 | 0 | 0.045 | ... |
+| Indiv_3 | 1 | 38 | 1 | -0.008 | ... |
 
 **Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). The first column must be SNP IDs.
 | SNP_ID | Indiv_1 | Indiv_2 | Indiv_3 | ... |
@@ -58,7 +58,7 @@ Before running the analysis, ensure your data follows these formats:
 
 **Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
 
-**Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of ~20,000+ approximately independent SNPs (selected via LD pruning or physical distance).
+**Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance).
 | SNP_ID |
 |:---:|
 | rs125 |
@@ -67,7 +67,7 @@ Before running the analysis, ensure your data follows these formats:
 
 ---
 
-### 2. Basic Multi-Trait GWAS (Small Scale)
+### 2. Basic Multi-trait GWAS
 For smaller datasets (e.g., $N < 20,000$), you can process the entire sample at once:
 
 ```r
@@ -80,18 +80,18 @@ library(RmvLMM)
 results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "results.rds")
 ```
 
-### 3. Biobank-Scale Aggregation (Large Scale)
+### 3. Biobank-Scale Aggregation
 For large cohorts (e.g., UK Biobank), we recommend a "Divided-and-Combined" strategy:
 
 1.  **Split Samples:** Divide the total sample into multiple groups, each containing about 10,000 individuals.
-2.  **Parallel Processing:** For each group, run `run_RmvLMM()` independently and save the results as `.rds` files.
+2.  **Parallel Processing:** For each group, run `run_RmvLMM()` independently and save the results as `_partXX.rds` files.
 3.  **Identify Calibration SNPs:** Prepare a ID list of at least 20,000 approximately independent SNPs.
-4.  **Combine & Calibrate:** Use `bank_RmvLMM` to aggregate the results into a final omnibus test.
+4.  **Combine & Calibrate:** Use `bank_RmvLMM()` to aggregate the results into a final omnibus test.
 
 ```r
 # Combine results from multiple group files
 final_results <- bank_RmvLMM(
-  rds_files = c("part1.rds", "part2.rds", "part3.rds", ...),    # obtained from run_RmvLMM() for all groups
+  rds_files = c("_part1.rds", "_part2.rds", "_part3.rds", ...),    # obtained from run_RmvLMM() for all groups
   indep_snp_file = "independent_snps.csv",    # ID List of ~20,000+ independent SNPs
   out_file = "final_calibrated_results.rds"
 )
@@ -106,15 +106,14 @@ RmvLMM is highly optimized for large-scale tasks.
 - **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait LMM-GWAS at this scale within a reasonable timeframe.
 
 ### 2. Optimization: Pre-computing Eigen-decomposition
-The eigen-decomposition of the relatedness matrix $K$ is computationally expensive ($O(N^3)$). If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
+The eigen-decomposition of the relatedness matrix $K$ is computationally expensive. If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
 
 ```r
 # Pre-compute eigen-decomposition once
 eK <- eigen(K, symmetric = TRUE)
 K_precomp <- list(
   Ak_diag = eK$values,
-  Qk = eK$vectors
-)
+  Qk = eK$vectors)
 
 # Pass K_precomp to run_RmvLMM
 results <- run_RmvLMM(Y = Y, X = X, G = G, K_precomp = K_precomp, out_file = "batch1.rds")
