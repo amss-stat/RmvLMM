@@ -13,7 +13,6 @@ Description: RmvLMM is a powerful and scalable statistical framework for multi-t
     a fast iterative algorithm for covariance estimation.
 License: MIT
 Encoding: UTF-8
-LazyData: true
 Depends: 
     R (>= 4.4.0)
 Imports: 

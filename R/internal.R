@@ -281,7 +281,7 @@ fit.generalgamma.mle <- function(data, inits = NULL) {
   }
 
   # 4. Non-gradient methods for MLE
-  fit <- flexsurv::flexsurvreg(Surv(clean_data) ~ 1,
+  fit <- flexsurv::flexsurvreg(survival::Surv(clean_data) ~ 1,
                      dist = "gengamma",
                      inits = inits,
                      method = "Nelder-Mead",
