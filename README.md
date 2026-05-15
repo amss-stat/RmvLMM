@@ -84,7 +84,7 @@ results <- run_RmvLMM(Y = Y, X = X, K = K, G = G, out_file = "results.rds")
 ### 3. Biobank-Scale Aggregation
 For large cohorts (e.g., UK Biobank), we recommend a "Divided-and-Combined" strategy:
 
-1.  **Split Samples:** Divide the total sample into multiple groups, each containing about 10,000 individuals.
+1.  **Divide Samples:** Divide the total sample into multiple groups, each containing about 10,000 individuals.
 2.  **Parallel Processing:** For each group, run `run_RmvLMM()` independently and save the results as `_partXX.rds` files.
 3.  **Identify Calibration SNPs:** Prepare an ID list of at least 20,000 approximately independent SNPs.
 4.  **Combine & Calibrate:** Use `bank_RmvLMM()` to aggregate the results into a final omnibus test.
