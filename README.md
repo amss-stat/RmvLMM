@@ -2,46 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
-
-Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these computational challenges using an orthogonal method, achieving both computational efficiency and high detection power.
-
-## Key Features
-
-- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-trait analysis.
-- **Fast MoM-REML Iterative algorithm:** A novel algorithm for rapid covariance matrix estimation.
-- **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
-- **Biobank Scalability:** Efficiently handles tens of thousands of individuals and millions of SNPs.
-
-## Installation
-
-You can install the development version of RmvLMM from GitHub:
-
-```r
-# install.packages("remotes")
-remotes::install_github("amss-stat/RmvLMM")
-```
-
-### Dependencies
-Tested with:
-- R (>= 4.4.0)
-- data.table (1.17.2)
-- MASS (7.3.65)
-- survival (3.8.3)
-- flexsurv (2.3.2)
-
-这个README整体结构清晰，逻辑严密。针对你提出的修改要求，我对内容进行了润色和补充，修复了小的笔误（如 "traIT"），并增加了数据格式的可视化展示。
-
-以下是修改后的版本：
-
----
-
-# RmvLMM: A Rotated Multivariate Linear Mixed Model for Dual Large-Scale GWAS
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
 [![Package version](https://img.shields.io/badge/version-0.0.0.9000-orange.svg)](https://github.com/amss-stat/RmvLMM)
 
-Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, designed for biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these challenges using an orthogonal rotation framework, achieving both computational efficiency and high detection power.
+Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these challenges using an orthogonal rotation framework, achieving both computational efficiency and high detection power.
 
 ## Key Features
 
