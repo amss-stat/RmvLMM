@@ -10,7 +10,7 @@ As detailed in our paper, *"A rotated multivariate linear mixed model for dual l
 ## Key Features
 
 - **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multivariate analysis.
-- **Fast Iterative REML:** A novel algorithm for rapid covariance matrix estimation.
+- **Fast MoM-REML Iterative algorithm:** A novel algorithm for rapid covariance matrix estimation.
 - **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
 - **Biobank Scalability:** Efficiently handles tens of thousands of individuals and millions of SNPs.
 
