@@ -22,33 +22,33 @@ make_psd <- function(matrix, min_eig = 1e-12) {
 reml_neg_log_lik_optimized <- function(xi, y, M, Ak_diag) {
   V_diag <- xi * Ak_diag + 1
   if (any(V_diag <= 0)) return(list(neg_log_lik = Inf, xi = xi))
-  
+
   V_inv_diag <- 1 / V_diag
   V_inv_y <- y * V_inv_diag
-  
+
   M_t_V_inv_M <- crossprod(M, M * V_inv_diag)
   M_t_V_inv_y <- crossprod(M, V_inv_y)
-  
+
   b_hat <- tryCatch(solve(M_t_V_inv_M, M_t_V_inv_y), error = function(e) NULL)
-  
+
   if (is.null(b_hat)) {
     return(list(neg_log_lik=Inf, b_hat=NULL, M_t_V_inv_M=M_t_V_inv_M, xi=xi))
   }
-  
+
   y_t_P_y <- sum(y * V_inv_y) - crossprod(M_t_V_inv_y, b_hat)
   log_det_V <- sum(log(V_diag))
-  
+
   log_det_XtVinvX_res <- determinant(M_t_V_inv_M, logarithm = TRUE)
   if (log_det_XtVinvX_res$sign <= 0) {
     return(list(neg_log_lik=Inf, b_hat=b_hat, M_t_V_inv_M=M_t_V_inv_M, xi=xi))
   }
-  
+
   log_det_XtVinvX <- as.numeric(log_det_XtVinvX_res$modulus)
   neg_log_lik <- 0.5 * (log_det_V + log_det_XtVinvX + y_t_P_y)
-  
-  return(list(neg_log_lik=as.numeric(neg_log_lik), 
+
+  return(list(neg_log_lik=as.numeric(neg_log_lik),
               b_hat=b_hat,
-              M_t_V_inv_M=M_t_V_inv_M, 
+              M_t_V_inv_M=M_t_V_inv_M,
               xi=xi))
 }
 
@@ -58,7 +58,7 @@ reml_neg_log_lik_optimized <- function(xi, y, M, Ak_diag) {
 # ===================================================================
 solve_univariate_lmm_reml_optimized <- function(y, M, Ak_diag) {
   last_successful_result <- NULL
-  
+
   f_wrapper <- function(xi_val) {
     res <- reml_neg_log_lik_optimized(xi_val, y, M, Ak_diag)
     if (is.finite(res$neg_log_lik)) {
@@ -66,15 +66,15 @@ solve_univariate_lmm_reml_optimized <- function(y, M, Ak_diag) {
     }
     return(res$neg_log_lik)
   }
-  
+
   res_opt <- optimize(f = f_wrapper, interval = c(1e-2, 1e2))
   xi_hat <- res_opt$minimum
-  
-  
+
+
   if (is.null(last_successful_result$b_hat)) {
     A <- last_successful_result$M_t_V_inv_M
     b <- crossprod(M, y * (1 / (xi_hat * Ak_diag + 1)))
-    
+
     svd_A <- svd(A)
     d <- svd_A$d
     tol_svd <- max(dim(A)) * .Machine$double.eps * max(d)
@@ -83,7 +83,7 @@ solve_univariate_lmm_reml_optimized <- function(y, M, Ak_diag) {
   } else {
     b_hat <- last_successful_result$b_hat
   }
-  
+
   return(list(xi_hat = xi_hat, b_hat = b_hat))
 }
 
@@ -123,14 +123,14 @@ fit_multivariate_lmm_optimized <- function(precomputed_data, max_iter = 200, tol
   n <- nrow(X_rot)
   c <- ncol(X_rot)
   d <- ncol(Y_rot)
-  
+
   # --- Initialization ---
   Vb <- diag(d)
   Ve <- diag(d)
   norm_Vb_prev <- norm(Vb, "F")
   norm_Ve_prev <- norm(Ve, "F")
   Gamma_transformed_hat <- matrix(0, nrow = c, ncol = d)
-  Xi_hat_diag <- numeric(d)  
+  Xi_hat_diag <- numeric(d)
 
   # --- Iteration loop ---
   for (k in 1:max_iter) {
@@ -139,46 +139,46 @@ fit_multivariate_lmm_optimized <- function(precomputed_data, max_iter = 200, tol
     Qe <- eVe$vectors
     Ae_sqrt_vec <- sqrt(Ae_diag)
     Ae_inv_sqrt_vec <- 1 / Ae_sqrt_vec
-    
+
     M <- crossprod(Qe, Vb) %*% Qe
     matrix_for_eigh <- M * tcrossprod(Ae_inv_sqrt_vec)
     eXi <- eigen(matrix_for_eigh, symmetric = TRUE)
     U <- eXi$vectors
-    
+
     rot_matrix_for_Y <- sweep(Qe, 2, Ae_inv_sqrt_vec, "*") %*% U
     Y_transformed <- Y_rot %*% rot_matrix_for_Y
-    
+
     # --- Solve the d univariate REML problems --- #
     for (j in 1:d) {
       reml_res <- solve_univariate_lmm_reml_optimized(Y_transformed[, j], X_rot, Ak_diag)
       Xi_hat_diag[j] <- reml_res$xi_hat
       Gamma_transformed_hat[, j] <- reml_res$b_hat
     }
-    
+
     M_rot <- sweep(Qe, 2, Ae_sqrt_vec, "*") %*% U
     Vb_new <- tcrossprod(sweep(M_rot, 2, Xi_hat_diag, "*"), M_rot)
     Gamma_hat <- tcrossprod(Gamma_transformed_hat, M_rot)
-    
-    
+
+
     H_hat_rotated <- Y_rot - (X_rot %*% Gamma_hat)
     Ve_mom <- (crossprod(H_hat_rotated) / n) - (trK / n) * Vb_new
     Ve_new <- make_psd(Ve_mom, min_eig = 1e-12)
-    
+
     diff_Vb <- norm(Vb_new - Vb, "F") / (norm_Vb_prev + 1e-8)
     diff_Ve <- norm(Ve_new - Ve, "F") / (norm_Ve_prev + 1e-8)
-    
+
     Vb <- Vb_new
     Ve <- Ve_new
     norm_Vb_prev <- norm(Vb, "F")
     norm_Ve_prev <- norm(Ve, "F")
-    
+
     if (verbose == 2) cat(sprintf("Iter %d: dVb=%.6f, dVe=%.6f\n", k, diff_Vb, diff_Ve))
     if (diff_Vb < tol && diff_Ve < tol) {
       if (verbose >= 1) cat(sprintf("Converged after %d iterations.\n", k)); break
     }
   }
   if (k == max_iter && verbose >= 1) cat(sprintf("Warning: Failed to converge after %d iterations.\n", max_iter))
-  
+
   return(list(Vb = Vb, Ve = Ve, Gamma = Gamma_hat, n_iter = k))
 }
 
@@ -249,48 +249,48 @@ prepare_hypothesis_test_data <- function(precomputed_data, Vb_est, Ve_est) {
 
 #' Maximum likelihood estimation of the generalized gamma distribution
 fit.generalgamma.mle <- function(data, inits = NULL) {
-  
+
   # 1. Data cleaning
   clean_data <- data[data > 1e-8 & is.finite(data)]
   if(length(clean_data) < 10) stop("Insufficient sample size to perform model fitting.")
-  
+
   # 2. Initialization
   if (is.null(inits)) {
     log_data <- log(clean_data)
-    
+
     init_mu <- mean(log_data)
     init_sigma <- sd(log_data)
-    
+
     n <- length(log_data)
     m2 <- sum((log_data - init_mu)^2) / n
     m22 <- max(m2, 1e-8)
     m3 <- sum((log_data - init_mu)^3) / n
     init_Q <- m3 / (m22^(1.5))
-    
+
     # 3. Range of initial values
     if (init_mu > 20) init_mu <- 20
     if (init_sigma < 0.001) init_sigma <- 0.001
     if (init_sigma > 100) init_sigma <- 100
-    if (init_Q > 10) init_Q <- 10  
+    if (init_Q > 10) init_Q <- 10
     if (init_Q < -10) init_Q <- -10
     if (abs(init_Q) < 0.01) {
       init_Q <- 0.01 * ifelse(init_Q >= 0, 1, -1)
     }
-    
+
     inits <- c(init_mu, init_sigma, init_Q)
   }
-  
+
   # 4. Non-gradient methods for MLE
-  fit <- flexsurvreg(Surv(clean_data) ~ 1, 
-                     dist = "gengamma", 
+  fit <- flexsurv::flexsurvreg(Surv(clean_data) ~ 1,
+                     dist = "gengamma",
                      inits = inits,
                      method = "Nelder-Mead",
                      hessian = FALSE,
                      control = list(maxit = 10000, reltol = 1e-8))
-  
+
   est <- fit$res[, "est"]
   names(est) <- c("mu", "sigma", "Q")
-  
+
   return(est)
 }
 
