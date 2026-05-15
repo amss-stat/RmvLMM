@@ -49,7 +49,7 @@ Before running the analysis, ensure your data follows these formats:
 | Indiv_2 | 1 | 52 | 0 | 0.045 | ... |
 | Indiv_3 | 1 | 38 | 1 | -0.008 | ... |
 
-**Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). SNP IDs must be provided as row names.
+**Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). SNP IDs must be provided as row names. A numeric vector is also acceptable for a single SNP.
 | SNP | Indiv_1 | Indiv_2 | Indiv_3 | ... |
 |:---:|:---:|:---:|:---:|:---:|
 | rs1001 | 0 | 1 | 0 | ... |
@@ -58,14 +58,14 @@ Before running the analysis, ensure your data follows these formats:
 
 **Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
 
-**Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance).
+**Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance). The file must contain a header named SNP with the corresponding IDs.
 | SNP |
 |:---:|
 | rs125 |
 | rs458 |
 | rs992 |
 
-*Note: The file must contain a header named SNP with the corresponding IDs. For all input matrices, IDs should be provided as row/column names and not as the first row/column of the numeric data.*
+*Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
 ---
 
