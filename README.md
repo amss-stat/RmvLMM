@@ -134,6 +134,29 @@ final_results <- bank_RmvLMM(
 )
 ```
 
+## Performance and Computational Tips
+
+### 1. Memory and Efficiency
+RmvLMM is highly optimized for large-scale tasks. 
+- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires only **~3GB of RAM**.
+- **Real-world Benchmark:** In our study, an analysis of **323,839 individuals, 454,296 SNPs, and 26 traits** was completed in just **13 hours** using a server with 60 cores and 180GB of RAM.
+- **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait LMM-GWAS at this scale within a reasonable timeframe.
+
+### 2. Optimization: Pre-computing Eigen-decomposition
+The eigen-decomposition of the relatedness matrix $K$ is computationally expensive ($O(N^3)$). If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
+
+```r
+# Pre-compute eigen-decomposition once
+eK <- eigen(K, symmetric = TRUE)
+K_precomp <- list(
+  Ak_diag = eK$values,
+  Qk = eK$vectors
+)
+
+# Pass K_precomp to run_RmvLMM
+results <- run_RmvLMM(Y = Y, X = X, G = G, K_precomp = K_precomp, out_file = "batch1.rds")
+```
+
 ## Citation
 
 If you use RmvLMM in your research, please cite:
