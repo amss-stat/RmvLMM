@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R version](https://img.shields.io/badge/R-%3E%3D%204.4.0-blue.svg)](https://www.r-project.org/)
-[![Package version](https://img.shields.io/badge/version-0.0.0.9-orange.svg)](https://github.com/amss-stat/RmvLMM)
+[![Package version](https://img.shields.io/badge/version-0.0.0.9000-orange.svg)](https://github.com/amss-stat/RmvLMM)
 
 Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable statistical framework for dual large-scale GWAS, applicable to biobank-scale samples and a large number of phenotypes. Existing multi-trait GWAS methods are often computationally prohibitive for such massive datasets due to memory constraints and processing time. RmvLMM addresses these challenges using an orthogonal rotation framework, achieving both computational efficiency and high detection power.
 
@@ -49,8 +49,8 @@ Before running the analysis, ensure your data follows these formats:
 | Indiv_2 | 1 | 52 | 0 | 0.045 | ... |
 | Indiv_3 | 1 | 38 | 1 | -0.008 | ... |
 
-**Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). The first column must be SNP IDs.
-| SNP_ID | Indiv_1 | Indiv_2 | Indiv_3 | ... |
+**Genotype Matrix (`G`)**: $M \times N$ matrix (SNPs in rows, Individuals in columns). SNP IDs must be provided as row names.
+| SNP | Indiv_1 | Indiv_2 | Indiv_3 | ... |
 |:---:|:---:|:---:|:---:|:---:|
 | rs1001 | 0 | 1 | 0 | ... |
 | rs1002 | 2 | 1 | 0 | ... |
@@ -59,11 +59,13 @@ Before running the analysis, ensure your data follows these formats:
 **Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
 
 **Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance).
-| SNP_ID |
+| SNP |
 |:---:|
 | rs125 |
 | rs458 |
 | rs992 |
+
+*Note: The file must contain a header named SNP with the corresponding IDs. For all input matrices, IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
 ---
 
@@ -86,14 +88,14 @@ For large cohorts (e.g., UK Biobank), we recommend a "Divided-and-Combined" stra
 
 1.  **Split Samples:** Divide the total sample into multiple groups, each containing about 10,000 individuals.
 2.  **Parallel Processing:** For each group, run `run_RmvLMM()` independently and save the results as `_partXX.rds` files.
-3.  **Identify Calibration SNPs:** Prepare a ID list of at least 20,000 approximately independent SNPs.
+3.  **Identify Calibration SNPs:** Prepare an ID list of at least 20,000 approximately independent SNPs.
 4.  **Combine & Calibrate:** Use `bank_RmvLMM()` to aggregate the results into a final omnibus test.
 
 ```r
 # Combine results from multiple group files
 final_results <- bank_RmvLMM(
   rds_files = c("_part1.rds", "_part2.rds", "_part3.rds", ...),    # obtained from run_RmvLMM() for all groups
-  indep_snp_file = "independent_snps.csv",    # ID List of ~20,000+ independent SNPs
+  indep_snp_file = "independent_snps.csv",    # ID List of ~20,000+ approximately independent SNPs
   out_file = "final_calibrated_results.rds"
 )
 ```
@@ -102,9 +104,9 @@ final_results <- bank_RmvLMM(
 
 ### 1. Memory and Efficiency
 RmvLMM is highly optimized for large-scale tasks. 
-- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires only **~16GB of RAM**.
+- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires **~16GB of RAM**.
 - **Real-world Benchmark:** In our study, an analysis of **323,839 individuals, 454,296 SNPs, and 26 traits** was completed in just **13 hours** using a server with 60 cores and 180GB of RAM.
-- **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait GWAS based on linear mixed model at this scale within a reasonable timeframe.
+- **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait LMM-based GWAS at this scale within a reasonable timeframe.
 
 ### 2. Optimization: Pre-computing Eigen-decomposition
 The eigen-decomposition of the relatedness matrix $K$ is computationally expensive. If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
@@ -123,4 +125,6 @@ results <- run_RmvLMM(Y = Y, X = X, G = G, K_precomp = K_precomp, out_file = "ba
 ## Citation
 
 If you use RmvLMM in your research, please cite:
-> Guo, H. *et al*. *A rotated multivariate linear mixed model for dual large-scale genome-wide association study* (Submitted to Nature Genetics, 2026).
+> Guo, H.<sup>†</sup>, Zhang, Q.<sup>†</sup>, Zheng, X., Quan, Y., & Li, Q.<sup>*</sup> (2026). *A rotated multivariate linear mixed model for dual large-scale genome-wide association study* (Submitted).
+> <sup>†</sup> The first two authors should be regarded as Joint First Authors.  
+> <sup>*</sup> Corresponding author. E-mail: [liqz@amss.ac.cn](mailto:liqz@amss.ac.cn)
