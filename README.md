@@ -102,6 +102,24 @@ final_results <- bank_RmvLMM(
 ```
 *For more details, you can browse the demo code in the `example` folder, or view the function comments in `main.r` in the `R` folder.*
 
+## Output Formats
+
+### 1. Results from `run_RmvLMM`
+
+| Element | Type | Description |
+| :--- | :--- | :--- |
+| **`$results`** | `data.frame` | A table with two columns: <br> - `SNP`: SNP identifier (from rownames of G). <br> - `p_TOP2`: The raw joint p-value for the group (or small sample), calculated via the TOP2 statistics method. |
+| **`$Vb`** | `matrix` | Estimated random polygenic covariance matrix ($D \times D$). |
+| **`$Ve`** | `matrix` | Estimated random error covariance matrix ($D \times D$). |
+
+### 2. Results from `bank_RmvLMM`
+
+| Element | Type | Description |
+| :--- | :--- | :--- |
+| **`$results`** | `data.frame` | A table with two columns: <br> - `SNP`: SNP identifier. <br> - `p_omnibus`: The final, calibrated p-value. The value is derived from Fisher’s combination of group-wise results and calibrated using the generalized gamma distribution. |
+| **`$Vb`** | `matrix` | Final estimated random polygenic covariance matrix ($D \times D$) |
+| **`$Ve`** | `matrix` | Final estimated random error covariance matrix ($D \times D$). |
+
 ## Performance and Computational Tips
 
 ### 1. Memory and Efficiency
