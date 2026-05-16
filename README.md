@@ -35,6 +35,7 @@ Tested with:
 
 ### 1. Input Data Format
 Before running the analysis, ensure your data follows these formats:
+
 *Note: `RmvLMM` is designed to be compatible with standard GWAS pipelines. Upstream tasks such as quality control and sample/SNP splitting are ideally performed using tools like `PLINK` before loading matrices into `R`.*
 
 **Phenotype Matrix (`Y`)**: $N \times D$ matrix of quantitative traits.
