@@ -104,6 +104,8 @@ final_results <- bank_RmvLMM(
 
 ## Output Formats
 
+Both `run_RmvLMM` and `bank_RmvLMM` return a list object.
+
 ### 1. Results from `run_RmvLMM`
 
 | Element | Type | Description |
