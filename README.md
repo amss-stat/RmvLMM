@@ -8,10 +8,11 @@ Rotated multivariate Linear Mixed Model **(RmvLMM)** is a powerful and scalable 
 
 ## Key Features
 
-- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-trait analysis.
-- **Fast MoM-REML Iterative Algorithm:** A novel algorithm for rapid covariance matrix estimation.
-- **Divided-and-Combined Strategy:** Supports parallelized analysis across split-sample groups, aggregating signals into a robust omnibus test.
-- **Biobank Scalability:** Efficiently handles hundreds of thousands of individuals and millions of SNPs.
+- **Orthogonal Rotation:** Decorrelates multiple traits to enable efficient multi-trait analysis and achieve high detection power.
+- **Fast MoM-REML Iterative Algorithm:** A novel algorithm combining the Method-of-Moments and REML for rapid covariance matrix estimation.
+- **Divided-and-Combined Strategy:** Parallelizes analysis across split-sample groups, aggregating signals into a robust omnibus test and calibrating results via generalized gamma distribution approximation.
+- **Biobank Scalability:** Efficiently handles hundreds of thousands of individuals and millions of SNPs. It allows users to flexibly partition samples and process SNP matrices in batches based on available computational resources, enabling efficient multi-trait GWAS at the Biobank scale.
+- **Modular Design:** `RmvLMM` package follows a modular philosophy by focusing on the core statistical inference, allowing for seamless integration with high-performance I/O tools like `PLINK`.
 
 ## Installation
 
@@ -34,6 +35,7 @@ Tested with:
 
 ### 1. Input Data Format
 Before running the analysis, ensure your data follows these formats:
+*Note: `RmvLMM` is designed to be compatible with standard GWAS pipelines. Upstream tasks such as quality control and sample/SNP splitting are ideally performed using tools like `PLINK` before loading matrices into `R`.*
 
 **Phenotype Matrix (`Y`)**: $N \times D$ matrix of quantitative traits.
 | ID | Trait_1 | Trait_2 | ... | Trait_D |
@@ -58,7 +60,7 @@ Before running the analysis, ensure your data follows these formats:
 
 *Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
-**Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix. $K$ must be a positive definite matrix. If $K$ is not a positive definite matrix, consider adding small perturbations to the eigenvalues ​​or diagonal elements.
+**Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix. $K$ must be positive definite. If not, consider adding small perturbations to the eigenvalues ​​or diagonal elements.
 
 **Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance). The file must contain a header named SNP with the corresponding IDs.
 | SNP |
@@ -103,12 +105,12 @@ final_results <- bank_RmvLMM(
 
 ### 1. Memory and Efficiency
 RmvLMM is highly optimized for large-scale tasks. 
-- **Reference Task:** A task with **10,000 individuals and 100,000 SNPs** typically requires **~16GB of RAM**.
+- **Reference Task:** A task with **26 traits, 10,000 individuals and 100,000 SNPs** typically requires **~16GB of RAM**.
 - **Real-world Benchmark:** In our study, an analysis of **323,839 individuals, 454,296 SNPs, and 26 traits** was completed in just **13 hours** using a server with 60 cores and 180GB of RAM.
 - **Flexibility:** Users can flexibly adjust the sample group size and SNP batching based on available computational resources. To our knowledge, RmvLMM is currently the only method capable of performing exact multi-trait LMM-based GWAS at this scale within a reasonable timeframe.
 
 ### 2. Optimization: Pre-computing Eigen-decomposition
-The eigen-decomposition of the relatedness matrix $K$ is computationally expensive. If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
+The eigendecomposition of the relatedness matrix $K$ is computationally expensive. If you need to call `run_RmvLMM()` multiple times for the same set of individuals (e.g., when processing SNPs in different batches), you can pre-compute the decomposition and pass it via the `K_precomp` parameter to avoid redundant calculations:
 
 ```r
 # Pre-compute eigen-decomposition once
