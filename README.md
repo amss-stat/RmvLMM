@@ -58,7 +58,7 @@ Before running the analysis, ensure your data follows these formats:
 
 *Note:  For all input matrices (`Y, X, G`), IDs should be provided as row/column names and not as the first row/column of the numeric data.*
 
-**Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix.
+**Sample Relatedness Matrix (`K`)**: $N \times N$ kinship or GRM matrix. $K$ must be a positive definite matrix. If $K$ is not a positive definite matrix, consider adding small perturbations to the eigenvalues ​​or diagonal elements.
 
 **Independent SNPs List (`independent_snps.csv`)**: A single-column file containing IDs of at least 20,000 approximately independent SNPs (selected via LD pruning or physical distance). The file must contain a header named SNP with the corresponding IDs.
 | SNP |
