@@ -36,7 +36,7 @@ Tested with:
 ### 1. Input Data Format
 Before running the analysis, ensure your data follows these formats:
 
-*Note: `RmvLMM` is designed to be compatible with standard GWAS pipelines. Upstream tasks such as quality control and sample/SNP splitting are ideally performed using tools like `PLINK` before loading matrices into `R`.*
+*Note: `RmvLMM` package is designed to be compatible with standard GWAS pipelines. Upstream tasks such as quality control and sample/SNP splitting are ideally performed using tools like `PLINK` before loading matrices into `R`.*
 
 **Phenotype Matrix (`Y`)**: $N \times D$ matrix of quantitative traits.
 | ID | Trait_1 | Trait_2 | ... | Trait_D |
@@ -104,9 +104,9 @@ final_results <- bank_RmvLMM(
 
 ## Output Formats
 
-Both `run_RmvLMM` and `bank_RmvLMM` return a list object.
+Both `run_RmvLMM()` and `bank_RmvLMM()` return a list object.
 
-### 1. Results from `run_RmvLMM`
+### 1. Results from `run_RmvLMM()`
 
 | Element | Type | Description |
 | :--- | :--- | :--- |
@@ -114,7 +114,7 @@ Both `run_RmvLMM` and `bank_RmvLMM` return a list object.
 | **`$Vb`** | `matrix` | Estimated random polygenic covariance matrix ($D \times D$). |
 | **`$Ve`** | `matrix` | Estimated random error covariance matrix ($D \times D$). |
 
-### 2. Results from `bank_RmvLMM`
+### 2. Results from `bank_RmvLMM()`
 
 | Element | Type | Description |
 | :--- | :--- | :--- |
