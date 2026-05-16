@@ -6,7 +6,11 @@ Authors@R: c(
            email = "zhangqinyuan19@mails.ucas.ac.cn", 
            role = c("aut", "cre")),
     person("Qizhai", "Li", 
-           role = "aut")
+           role = "aut"),
+    person("Hongping", "Guo",
+           role = "ctb"),
+    person("Xueqin", "Zheng",
+           role = "ctb")
   )
 Description: RmvLMM is a powerful and scalable statistical framework for multi-trait GWAS 
     on biobank-scale samples. It employs orthogonal rotation to decorrelate traits and 
