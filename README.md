@@ -97,7 +97,7 @@ final_results <- bank_RmvLMM(
   out_file = "final_calibrated_results.rds"
 )
 ```
-* For more details, you can browse the demo code in the `example` folder, or view the function comments in `main.r` in the `R` folder. *
+*For more details, you can browse the demo code in the `example` folder, or view the function comments in `main.r` in the `R` folder.*
 
 ## Performance and Computational Tips
 
